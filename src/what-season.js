@@ -5,33 +5,34 @@ module.exports = function getSeason(date) {
     return 'Unable to determine the time of year!'
   }
 
-  if (!date || date.constructor.name !== 'Date') {
-    throw new CustomError('Not date');
+  if (!date || !date.constructor || !date.constructor.name || date.constructor.name !== 'Date') {
+    throw new Error('Not date');
   }
 
   const seasonName = {
     spring: 'spring',
     summer: 'summer',
-    fall: 'fall',
+    fall: 'autumn',
     winter: 'winter'
   }
 
   try {
-    const month = new Date(date.toSting()).getMonth();
+    const month = date.getMonth();
+    date.toLocaleString();
+
     switch (true) {
       case (month === 11 || month === 0 || month === 1):
         return seasonName.winter;
-      case (month >= 2 || month <= 4):
+      case (month >= 2 && month <= 4):
         return seasonName.spring;
-      case (month >= 5 || month <= 7):
+      case (month >= 5 && month <= 7):
         return seasonName.summer;
-      case (month >= 8):
-        return seasonName.fall
+      case (month >= 8 && month <= 10):
+        return seasonName.fall;
       default:
-        throw new CustomError('Not date');
+        throw new Error('Not date');
     }
-
   } catch (e) {
-    throw new CustomError('Not date');
+    throw new Error('Not date');
   }
 };
