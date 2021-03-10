@@ -5,7 +5,7 @@ module.exports = function getSeason(date) {
     return 'Unable to determine the time of year!'
   }
 
-  if (date?.constructor.name !== 'Date') {
+  if (!date || date.constructor.name !== 'Date') {
     throw new CustomError('Not date');
   }
 
