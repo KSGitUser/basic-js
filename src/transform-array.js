@@ -2,59 +2,61 @@ const CustomError = require("../extensions/custom-error");
 
 module.exports = function transform(arr) {
   if (!Array.isArray(arr)) {
-    throw new CustomError('Not array');
+    throw new Error('Not array');
   }
 
-  const checkSequence = (arr) => {
-    let tempArr = [];
-    nextIndex = 0;
-    arr.map((item, index) => {
-      if (index !== nextIndex) {
-        return;
-      }
-      switch (item) {
-        case '--discard-next':
-          tempArr.push(null);
-          tempArr.push(null);
+  let tempArr = [];
+  const f = [];
+  nextIndex = 0;
+  let index = -1;
+
+  while (index < arr.length - 1) {
+    index = nextIndex;
+    let item = arr[index];
+
+    switch (item) {
+      case '--discard-next':
+        tempArr = [...tempArr, null, null];
+        nextIndex += 2;
+        continue;
+      case '--discard-prev':
+        if (tempArr.length) {
+          if (tempArr[tempArr.length - 1] !== null) {
+            f.pop();
+          }
+          tempArr[tempArr.length - 1] = null;
+        }
+        tempArr.push(null);
+        nextIndex += 1;
+        continue;
+      case '--double-next':
+        if (index !== arr.length - 1) {
+          tempArr = [...tempArr, arr[index + 1], arr[index + 1]];
+          if (tempArr[index + 1] !== null) {
+            f.push(arr[index + 1]);
+            f.push(arr[index + 1]);
+          }
           nextIndex += 2;
-          break;
-        case '--discard-prev':
-          if (tempArr.length) {
-            tempArr[tempArr.length - 1] = null;
+        }
+        continue;
+      case '--double-prev':
+        if (tempArr.length) {
+          if (tempArr[tempArr.length - 1] !== null) {
+            f.push(f[f.length - 1]);
           }
-          tempArr.push(null);
-          nextIndex += 1;
-          break;
-        case '--double-next':
-          if (index !== arr.length-1) {
-            tempArr.push(arr[index + 1]);
-            tempArr.push(arr[index + 1]);
-            nextIndex += 2;
-          }
-          break;
-        case '--double-prev':
-          if (tempArr.length) {
-            tempArr.push(tempArr[tempArr.length - 1])
-          }
-          nextIndex += 1;
-          break;
-        default:
-          tempArr.push(item);
-          nextIndex += 1;
-          break;
-      }
-    });
+          tempArr.push(tempArr[tempArr.length - 1]);
+        }
+        nextIndex += 1;
+        continue;
+      default:
+        tempArr.push(item);
+        f.push(item);
+        nextIndex += 1;
+        continue;
+    }
+  };
 
-    const finalArr = [];
-    tempArr.map(item => {
-      if (item !== null) {
-        finalArr.push(item);
-      }
-    });
-    return finalArr;
-  }
+  return f;
 
-  return checkSequence(arr);
-  // remove line with error and write your code here
 };
 
