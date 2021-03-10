@@ -1,5 +1,3 @@
-const CustomError = require("../extensions/custom-error");
-
 const chainMaker = {
   itemsOfChain: [],
   getLength() {
@@ -11,9 +9,9 @@ const chainMaker = {
     return this;
   },
   removeLink(position) {
-    if (Number.isInteger(position) || position < 1 || position > this.itemsOfChain.length) {
+    if (Number.isInteger(position) && (position < 1 || position > this.itemsOfChain.length)) {
       this.itemsOfChain = [];
-      throw new CustomError('Wrong position');
+      throw new Error('Wrong position');
     }
     this.itemsOfChain = [...this.itemsOfChain.slice(0, position - 1), ...this.itemsOfChain.slice(position)];
     return this;
